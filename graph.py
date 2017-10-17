@@ -52,11 +52,7 @@ class DrawHeatMap:
 
                 percent = self.data[maxSplit][maxTermLen]
 
-                # Black and white for now
-                col = 255 - int(255 * percent * 1.85)
-                colour = (col,col,col)
-
-                self.drawPix(x1, y1, colour)
+                self.drawPix(x1, y1, self.getColour(percent))
 
     def drawText(self, text, x, y, size = 10, color = BLACK, fontType = 'arial.ttf'):
         text = str(text)
@@ -74,6 +70,26 @@ class DrawHeatMap:
     def drawPix(self, x, y, colour):
         self.screen.set_at((x, y), colour)
 
+    # Dodgy function (optimised for the data)
+    def getColour(self, val):
+        val *= 1000
+        if val < 100:
+            g = int(val / 100.0 * 255)
+            r = 75 - int(val / 100.0 * 50 )
+            return (r,g,255)
+        elif val < 250:
+            val -= 100
+            b = 255 - (val / 150.0 * 230)
+            return (25,255,b)
+        elif val < 400:
+            val -= 250
+            r = (val / 150.0 * 230) + 25
+            return (r,255,25)
+        elif val < 600:
+            val -= 400
+            g = 255 - (val / 200.0 * 255)
+            return (255, g, 25)
+        return (0,0,0)
 
 d = DrawHeatMap(data)
 time.sleep(10)

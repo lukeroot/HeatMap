@@ -1,4 +1,4 @@
-import pygame, time
+import pygame, time, math
 
 from dataFile import data
 
@@ -43,14 +43,11 @@ class DrawHeatMap:
             self.drawText(y, x, (y * -50) + 800)
 
     def drawData(self):
-        for x in range(50, 800):
-            for y in range(50, 800):
+        for x in range(50, 751):
+            for y in range(50, 751):
                 x1, y1 = self.translate(x, y)
 
-                maxSplit = x / 50
-                maxTermLen = y / 50
-
-                percent = self.data[maxSplit][maxTermLen]
+                percent = self.getPercent(x, y)
 
                 self.drawPix(x1, y1, self.getColour(percent))
 
@@ -69,6 +66,39 @@ class DrawHeatMap:
 
     def drawPix(self, x, y, colour):
         self.screen.set_at((x, y), colour)
+
+    def getPercent(self, x, y):
+        data = self.data
+        x /= 50.0
+        y /= 50.0
+
+        # Simple return if we land on an intersect
+        if (x % 1 == 0 and y % 1 == 0):
+            return data[int(x)][int(y)]
+        elif (x % 1 == 0):
+            val1 = data[int(x)][math.floor(y)]
+            val2 = data[int(x)][math.ceil(y)]
+
+            percent1 = val1 * abs(y - math.ceil(y))
+
+            percent2 = val2 * abs(y - math.floor(y))
+            percent = percent1 + percent2
+
+            return percent
+        elif (y % 1 == 0):
+            val1 = data[math.floor(x)][int(y)]
+            val2 = data[math.ceil(x)][int(y)]
+
+            percent1 = val1 * abs(x - math.ceil(x))
+
+            percent2 = val2 * abs(x - math.floor(x))
+            percent = percent1 + percent2
+
+            return percent
+        else:
+            #TODO Can't work out logic
+            return 0
+
 
     # Dodgy function (optimised for the data)
     def getColour(self, val):

@@ -96,9 +96,42 @@ class DrawHeatMap:
 
             return percent
         else:
+            return self.getPixelPercent(x, y)
             #TODO Can't work out logic
+            # val1 = $data[math.floor(x)][floor(y)]
             return 0
 
+    def getPixelPercent(self, x, y):
+        data = self.data
+
+        xVals = [math.floor(x), math.ceil(x)]
+        yVals = [math.floor(y), math.ceil(y)]
+
+        totalLen = 0
+        lengths = {}
+        for xVal in xVals:
+            for yVal in yVals:
+                distance = self.getPixelDistance((x, y), (xVal, yVal))
+                totalLen += distance
+                lengths.update({distance : data[int(xVal)][int(yVal)]})
+
+        percent = 0
+        for distance, value in lengths.iteritems():
+            # print "distance: " + str(distance)
+            # print "totalLen" + str(totalLen)
+            # print "value" + str(value);
+            # print (totalLen - distance) / totalLen
+            percent += ((distance / totalLen) * value) / 1.5
+
+        return percent
+
+    def getPixelDistance(self, curLoc, tarLoc):
+        xLenDiff = abs(curLoc[0] - tarLoc[0]) ** 2.0
+        yLenDiff = abs(curLoc[1] - tarLoc[1]) ** 2.0
+
+        length = abs(xLenDiff + yLenDiff) ** 0.5
+
+        return length
 
     # Dodgy function (optimised for the data)
     def getColour(self, val):
@@ -121,5 +154,8 @@ class DrawHeatMap:
             return (255, g, 25)
         return (0,0,0)
 
+
+
+
 d = DrawHeatMap(data)
-time.sleep(10)
+time.sleep(20)
